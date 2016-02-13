@@ -9,15 +9,16 @@ module.exports = class Proxy {
     this.callbacks = callbacks;
     this.hostname = hostname || '127.0.0.1';
     this.port = port || 8888;
+    this.requestId = 1;
 
     this.setupServer();
   }
 
   setupServer() {
     this.server = http.createServer((cReq, cRes) => {
-      this.callbacks['request'](cReq);
-      console.log(cReq.method, cReq.url);
-      console.log('---------');
+      let requestId = this.requestId++;
+
+      this.callbacks['request'](requestId, cReq);
 
       let urlObj = url.parse(cReq.url);
       let options = {
@@ -29,9 +30,7 @@ module.exports = class Proxy {
       };
 
       let pReq = http.request(options, (pRes) => {
-        this.callbacks['response'](cReq, pRes);
-        console.log(pRes.statusCode, cReq.url)
-        console.log('---------');
+        this.callbacks['response'](requestId, cReq, pRes);
 
         cRes.writeHead(pRes.statusCode, pRes.headers);
         pRes.pipe(cRes);
@@ -41,8 +40,6 @@ module.exports = class Proxy {
     }).listen(this.port, this.hostname);
 
     this.server.on('connect', (req, ctlSocket, head) => {
-      console.log('Connect', req.url);
-      console.log('---------');
       let urlObj = url.parse(`https://${req.url}`);
       let socket = net.connect(urlObj.port, urlObj.hostname, () => {
         ctlSocket.write('HTTP/1.1 200 Connection Established\r\n\r\n');

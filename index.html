@@ -3,17 +3,20 @@
   <head>
     <meta charset="UTF-8">
     <title>Amaretto</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
   </head>
   <body>
-    <div id='requests'>
-      <h1>Requests</h1>
-      <ul id='request-list'>
-      </ul>
-    </div>
-    <div id='responses'>
-      <h1>Responses</h1>
-      <ul id='response-list'>
-      </ul>
+    <div class="container">
+      <table id="request-table" class="table table-striped">
+        <thead>
+          <th>#</th>
+          <th>Status Code</th>
+          <th>Method</th>
+          <th>URL</th>
+        </thead>
+        <tbody id="request-table-tbody">
+        </tbody>
+      </table>
     </div>
     <script src="index.js"></script>
   </body>

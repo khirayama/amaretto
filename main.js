@@ -24,7 +24,7 @@ app.on('ready', () => {
     console.log(`enabled proxy with code ${code}`);
   });
 
-  mainWindow = new BrowserWindow({width: 800, height: 600});
+  mainWindow = new BrowserWindow({width: 1200, height: 800});
   mainWindow.loadURL(`file://${__dirname}/index.html`);
   mainWindow.webContents.openDevTools();
 
