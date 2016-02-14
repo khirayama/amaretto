@@ -17,26 +17,36 @@ module.exports = class Proxy {
   setupServer() {
     this.server = http.createServer((cReq, cRes) => {
       let requestId = this.requestId++;
+      let requestBody = '';
 
-      this.callbacks['request'](requestId, cReq);
+      cReq.on('data', (chunk) => { requestBody += chunk; });
 
-      let urlObj = url.parse(cReq.url);
-      let options = {
-        host: urlObj.hostname,
-        port: urlObj.port || 80,
-        path: urlObj.path,
-        headers: cReq.headers,
-        method: cReq.method
-      };
+      cReq.on('end', () => {
+        this.callbacks['request'](requestId, cReq, requestBody);
+        let urlObj = url.parse(cReq.url);
+        let options = {
+          host: urlObj.hostname,
+          port: urlObj.port || 80,
+          path: urlObj.path,
+          headers: cReq.headers,
+          method: cReq.method
+        };
 
-      let pReq = http.request(options, (pRes) => {
-        this.callbacks['response'](requestId, cReq, pRes);
+        let pReq = http.request(options, (pRes) => {
+          let responseBody = '';
 
-        cRes.writeHead(pRes.statusCode, pRes.headers);
-        pRes.pipe(cRes);
+          pRes.on('data', (chunk) => { responseBody += chunk; });
+          pRes.on('end', () => {
+            this.callbacks['response'](requestId, cReq, pRes, responseBody);
+            cRes.writeHead(pRes.statusCode, pRes.headers);
+            cRes.write(responseBody);
+            cRes.end();
+          });
+        });
+
+        pReq.write(requestBody);
+        pReq.end();
       });
-
-      cReq.pipe(pReq);
     }).listen(this.port, this.hostname);
 
     this.server.on('connect', (req, ctlSocket, head) => {

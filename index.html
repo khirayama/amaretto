@@ -7,16 +7,24 @@
   </head>
   <body>
     <div class="container">
-      <table id="request-table" class="table table-striped">
-        <thead>
-          <th>#</th>
-          <th>Status Code</th>
-          <th>Method</th>
-          <th>URL</th>
-        </thead>
-        <tbody id="request-table-tbody">
-        </tbody>
-      </table>
+      <div class="row">
+        <div class="col-md-6">
+          <table id="request-table" class="table table-striped">
+            <thead>
+              <th>#</th>
+              <th>Status Code</th>
+              <th>Method</th>
+              <th>URL</th>
+            </thead>
+            <tbody id="request-table-tbody">
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-6">
+          <div id="request-detail-panel">
+          </div>
+        </div>
+      </div>
     </div>
     <script src="index.js"></script>
   </body>

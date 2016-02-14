@@ -4,5 +4,8 @@
   "description": "",
   "main": "main.js",
   "author": "Tomoki Yamaguchi",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.3.0"
+  }
 }
