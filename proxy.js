@@ -17,12 +17,19 @@ module.exports = class Proxy {
   setupServer() {
     this.server = http.createServer((cReq, cRes) => {
       let requestId = this.requestId++;
-      let requestBody = '';
+      let chunks = [];
+      let totalChunkLength = 0;
 
-      cReq.on('data', (chunk) => { requestBody += chunk; });
+      cReq.on('data', (chunk) => {
+        chunks.push(chunk);
+        totalChunkLength += chunk.length;
+      });
 
       cReq.on('end', () => {
+        let requestBody = Buffer.concat(chunks, totalChunkLength);
+
         this.callbacks['request'](requestId, cReq, requestBody);
+
         let urlObj = url.parse(cReq.url);
         let options = {
           host: urlObj.hostname,
@@ -33,10 +40,17 @@ module.exports = class Proxy {
         };
 
         let pReq = http.request(options, (pRes) => {
-          let responseBody = '';
+          let chunks = [];
+          let totalChunkLength = 0;
 
-          pRes.on('data', (chunk) => { responseBody += chunk; });
+          pRes.on('data', (chunk) => {
+            chunks.push(chunk);
+            totalChunkLength += chunk.length;
+          });
+
           pRes.on('end', () => {
+            let responseBody = Buffer.concat(chunks, totalChunkLength);
+
             this.callbacks['response'](requestId, cReq, pRes, responseBody);
             cRes.writeHead(pRes.statusCode, pRes.headers);
             cRes.write(responseBody);
